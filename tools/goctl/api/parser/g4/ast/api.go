@@ -9,7 +9,6 @@ import (
 )
 
 const prefixKey = "prefix"
-const groupKey = "group"
 
 // Api describes syntax for api
 type Api struct {
@@ -53,15 +52,11 @@ func (v *ApiVisitor) acceptService(root, final *Api) {
 		}
 		v.duplicateServerItemCheck(service)
 
-		var prefix, group string
+		var prefix string
 		if service.AtServer != nil {
 			p := service.AtServer.Kv.Get(prefixKey)
 			if p != nil {
 				prefix = p.Text()
-			}
-			g := service.AtServer.Kv.Get(groupKey)
-			if g != nil {
-				group = g.Text()
 			}
 		}
 		for _, route := range service.ServiceApi.ServiceRoute {
@@ -97,14 +92,10 @@ func (v *ApiVisitor) acceptService(root, final *Api) {
 				v.panic(handlerExpr, "mismatched handler")
 			}
 
-			handlerKey := handlerExpr.Text()
-			if len(group) > 0 {
-				handlerKey = fmt.Sprintf("%s/%s", group, handlerExpr.Text())
-			}
-			if _, ok := final.handlerM[handlerKey]; ok {
+			if _, ok := final.handlerM[handlerExpr.Text()]; ok {
 				v.panic(handlerExpr, fmt.Sprintf("duplicate handler '%s'", handlerExpr.Text()))
 			}
-			final.handlerM[handlerKey] = Holder
+			final.handlerM[handlerExpr.Text()] = Holder
 		}
 		final.Service = append(final.Service, service)
 	}

@@ -105,6 +105,7 @@ func genRoutes(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error
 		if g.signatureEnabled {
 			signature = "\n rest.WithSignature(serverCtx.Config.Signature),"
 		}
+		fmt.Println("g.prefix: "+prefix)
 		if len(g.prefix) > 0 {
 			prefix = fmt.Sprintf(`
 rest.WithPrefix("%s"),`, g.prefix)
@@ -124,7 +125,7 @@ rest.WithPrefix("%s"),`, g.prefix)
 			gbuilder.WriteString("\n},")
 			routes = strings.TrimSpace(gbuilder.String())
 		}
-
+		fmt.Println("prefix: "+prefix)
 		if err := gt.Execute(&builder, map[string]string{
 			"routes":    routes,
 			"jwt":       jwt,
